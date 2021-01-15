@@ -1,0 +1,87 @@
+This is a short guide on how to setup an obfsproxy obfs2/obfs3 bridge
+on a Debian/Ubuntu system.
+
+Step 0: Install Python
+
+ To use obfsproxy you will need Python (>= 2.7) and pip. If you use
+ Debian testing (or unstable), or a version of Ubuntu newer than
+ Oneiric, this is easy:
+
+   # apt-get install python2.7 python-pip python-dev build-essential libgmp-dev
+
+
+Step 1: Install Tor
+
+ You will also need a development version of Tor. To do this, you
+ should use the following guide to install tor and
+ deb.torproject.org-keyring:
+ https://www.torproject.org/docs/debian.html.en#development
+
+ You need Tor 0.2.4.x because it knows how to automatically report
+ your obfsproxy address to BridgeDB.
+
+
+Step 2: Install obfsproxy
+
+  If you have pip, installing obfsproxy and its dependencies should be
+  a matter of a single command:
+
+    $ pip install obfsproxy
+
+
+Step 3: Setup Tor
+
+  Now setup Tor. Edit your /etc/tor/torrc to add:
+
+    SocksPort 0
+    ORPort 443 # or some other port if you already run a webserver/skype
+    BridgeRelay 1
+    Exitpolicy reject *:*
+
+    ## CHANGEME_1 -> provide a nickname for your bridge, can be anything you like
+    #Nickname CHANGEME_1
+    ## CHANGEME_2 -> provide some email address so we can contact you if there's a problem
+    #ContactInfo CHANGEME_2
+
+    ServerTransportPlugin obfs2,obfs3 exec /usr/local/bin/obfsproxy managed
+
+  Don't forget to uncomment and edit the CHANGEME fields.
+
+
+Step 4: Launch Tor and verify that it bootstraps
+
+  Restart Tor to use the new configuration file. (Preface with sudo if
+  needed.)
+
+    # service tor restart
+
+  Now check /var/log/tor/log and you should see something like this:
+
+    Nov 05 16:40:45.000 [notice] We now have enough directory information to build circuits.
+    Nov 05 16:40:45.000 [notice] Bootstrapped 80%: Connecting to the Tor network.
+    Nov 05 16:40:46.000 [notice] Bootstrapped 85%: Finishing handshake with first hop.
+    Nov 05 16:40:46.000 [notice] Bootstrapped 90%: Establishing a Tor circuit.
+    Nov 05 16:40:48.000 [notice] Tor has successfully opened a circuit. Looks like client functionality is working.
+    Nov 05 16:40:48.000 [notice] Bootstrapped 100%: Done.
+
+  If Tor is earlier in the bootstrapping phase, wait until it gets to 100%.
+
+
+Step 5: Set up port forwarding if needed
+
+  If you're behind a NAT/firewall, you'll need to make your bridge
+  reachable from the outside world — both on the ORPort and the
+  obfsproxy port. The ORPort is whatever you defined in step two
+  above. To find your obfsproxy port, check your Tor logs for two
+  lines similar to these:
+
+    Oct 05 20:00:41.000 [notice] Registered server transport 'obfs2' at '0.0.0.0:26821
+    Oct 05 20:00:42.000 [notice] Registered server transport 'obfs3' at '0.0.0.0:40172
+
+  The last number in each line, in this case 26821 and 40172, are the
+  TCP port numbers that you need to forward through your
+  firewall. (This port is randomly chosen the first time Tor starts,
+  but Tor will cache and reuse the same number in future runs.) If you
+  want to change the number, use Tor 0.2.4.7-alpha or later, and set
+  "ServerTransportListenAddr obfs2 0.0.0.0:26821" in your torrc.
+

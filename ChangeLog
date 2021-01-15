@@ -1,0 +1,80 @@
+Changes in version 0.2.7 - 2014-03-15
+ - Support SOCKS5 instead of SOCKS4. Patch by Yawning Angel. Fixes #9221.
+ - Fix a scramblesuit bug that makes bridges reject a session
+   ticket connection from already seen clients. Diagnosed and patched
+   by Yawning Angel. Fixes #11100.
+ - obfs3 now uses twisted.internet.threads.deferToThread to process
+   the key exchange outside of the main event loop.
+   Patch by Yawning Angel. Fixes #11015.
+ - Support gmpy2 if it is available in addition to gmpy.
+   Patch by Yawning Angel.
+
+
+Changes in version 0.2.6 - 2014-02-03
+ - Stop having 'gmpy' as a hard dependency by removing it from setup.py.
+   Now gmpy is only used if it was already installed on the system.
+
+
+Changes in version 0.2.5 - 2014-02-03
+ - Use gmpy's modular exponentiation function since it's more efficient.
+   Fixes #10031 and adds gmpy as a dependency. Patch by Philipp Winter.
+ - Add a transport method called setup() that gets called on obfsproxy
+   startup and can be used by transports for expensive initializations.
+   Patch by David Stainton.
+ - Add a transport method called get_public_server_options() that allows
+   transports to filter server-side options that should not be announced
+   to BridgeDB (because they might leak filesystem paths etc.) .
+   Patch by David Stainton. Fixes #10243.
+ - Make the circuit an attribute of the transport, rather than passing it
+   as a method argument. Patch by Ximin Luo. Fixes #10342.
+ - Rename the handshake() method to circuitConnected().
+   Patch by Ximin Luo.
+ - Add ScrambleSuit as transport protocol. Fixes #10598.
+
+
+Changes in version 0.2.4 - 2013-09-30
+ - Make pluggable transports aware of where they should store state
+   in the filesystem. Also introduce --data-dir CLI switch to specify
+   the path in external mode. Fixes #9815. Patch by Philipp Winter.
+ - Pass server-side parameters (like shared-secrets) from Tor to the
+   transports. Fixes #8979.
+
+
+Changes in version 0.2.3 - 2013-09-11
+ - Use the new pyptlib API (>= pyptlib-0.0.4). Patch by Ximin Luo.
+ - Add support for sending the pluggable transport name to Tor (using
+   the Extended ORPort) so that it can be considered in the statistics.
+ - Remove licenses of dependencies from the LICENSE file. (They were
+   moved to be with browser bundle packaging scripts.)
+ - Fix a bug in the SOCKS code. An assertion would trigger if
+   the SOCKS destination sent traffic before obfsproxy did.
+   Fixes #9239.
+ - Add a --version switch. Fixes #9255.
+
+
+Changes in version 0.2.2 - 2013-04-15
+ - Fix a bug where the CLI compatibility patch that was introduced
+   in 0.2.1 was placed in the wrong place, making it useless when
+   obfsproxy gets installed. Patch by Lunar.
+ - Add dependencies to the setup script.
+ - Update the HOWTO to use pip.
+
+
+Changes in version 0.2.1 - 2013-04-08
+ - Rename project from "pyobfsproxy" to "obfsproxy"!
+ - Add licenses of dependencies to the LICENSE file.
+ - Add support for logging exceptions to logfiles.
+ - Add shared secret support to obfs2.
+ - Add support for per-connection SOCKS arguments.
+ - Add a setup script for py2exe.
+ - Slightly improve the executable script.
+ - Improve command line interface compatibility between C-obfpsroxy
+   and Python-obfsproxy by supporting the "--managed" switch.
+
+
+Changes in version 0.0.2 - 2013-02-17
+ - Add some more files to the MANIFEST.in.
+
+
+Changes in version 0.0.1 - 2013-02-15
+ - Initial release.
